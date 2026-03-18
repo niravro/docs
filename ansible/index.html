@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ansible Interview Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --bg2: #111111;
+    --bg3: #181818;
+    --bg4: #1e1e1e;
+    --border: #262626;
+    --border2: #333;
+    --text: #e8e8e8;
+    --text2: #999;
+    --text3: #555;
+    --red: #ff4d4d;
+    --red-dim: #c0392b;
+    --red-bg: #1a0808;
+    --orange: #ff8c42;
+    --orange-bg: #1a0e04;
+    --yellow: #ffd166;
+    --yellow-bg: #1a1504;
+    --green: #06d6a0;
+    --green-bg: #041a12;
+    --blue: #4da6ff;
+    --blue-bg: #04101a;
+    --purple: #c084fc;
+    --purple-bg: #130d1e;
+    --teal: #22d3ee;
+    --teal-bg: #041419;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14.5px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* Top bar */
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ansible-badge {
+    background: var(--red);
+    color: #000;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .topbar-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .topbar-right {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+
+  /* Progress */
+  .progress-track {
+    height: 2px;
+    background: var(--border);
+    position: fixed;
+    top: 52px;
+    left: 0; right: 0;
+    z-index: 99;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--red);
+    transition: width 0.3s ease;
+  }
+
+  /* Shell */
+  .shell {
+    display: flex;
+    height: calc(100vh - 54px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 1rem 0;
+  }
+
+  .sidebar-section {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 1rem;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.12s;
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.4;
+  }
+
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { border-left-color: var(--red); color: var(--red); background: rgba(255,77,77,0.05); }
+
+  .nav-idx {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-idx { color: var(--red-dim); }
+
+  /* Main */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 2.5rem;
+  }
+
+  /* Cards */
+  .q-card { display: none; animation: fadeUp 0.2s ease; }
+  .q-card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header */
+  .q-header { margin-bottom: 2rem; }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.75rem;
+  }
+
+  .q-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .q-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  h1.q-title {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  /* Section */
+  .section { margin-bottom: 1.75rem; }
+
+  .sec-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sec-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  p { color: var(--text2); margin-bottom: 0.6rem; line-height: 1.75; }
+  p strong { color: var(--text); font-weight: 500; }
+  p:last-child { margin-bottom: 0; }
+
+  /* Code */
+  .code-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0.75rem 0;
+  }
+
+  .code-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: var(--bg4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .code-dots { display: flex; gap: 4px; }
+  .code-dots span { width: 7px; height: 7px; border-radius: 50%; }
+  .dr { background: #ff5f57; opacity:.6; }
+  .dy { background: #febc2e; opacity:.6; }
+  .dg { background: #28c840; opacity:.6; }
+
+  pre {
+    padding: 1rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.65;
+    overflow-x: auto;
+    color: var(--text);
+  }
+
+  .kw { color: var(--purple); }
+  .str { color: var(--green); }
+  .cm { color: var(--text3); font-style: italic; }
+  .key { color: var(--blue); }
+  .val { color: var(--teal); }
+  .op { color: var(--red); }
+  .fn { color: var(--yellow); }
+  .num { color: var(--orange); }
+
+  /* Callouts */
+  .callout {
+    border-radius: 5px;
+    padding: 0.8rem 1rem;
+    margin: 0.75rem 0;
+    font-size: 13.5px;
+    line-height: 1.65;
+    border-left: 3px solid;
+  }
+
+  .c-tip { background: rgba(6,214,160,0.07); border-color: var(--green); }
+  .c-warn { background: rgba(255,140,66,0.07); border-color: var(--orange); }
+  .c-info { background: rgba(77,166,255,0.07); border-color: var(--blue); }
+  .c-danger { background: rgba(255,77,77,0.07); border-color: var(--red); }
+
+  .c-tip strong { color: var(--green); }
+  .c-warn strong { color: var(--orange); }
+  .c-info strong { color: var(--blue); }
+  .c-danger strong { color: var(--red); }
+
+  /* Compare grid */
+  .cgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+  }
+
+  .ccard {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.9rem 1rem;
+  }
+
+  .ccard h4 {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+
+  .ccard ul { list-style: none; }
+  .ccard ul li {
+    font-size: 13px;
+    color: var(--text2);
+    padding: 0.2rem 0;
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.5;
+  }
+  .ccard ul li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  /* Table */
+  .ktable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 0.75rem 0;
+  }
+  .ktable th {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .ktable td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .ktable tr:last-child td { border-bottom: none; }
+  .ktable tr:hover td { background: var(--bg3); }
+  .ktable td:first-child { font-family: var(--mono); font-size: 11.5px; color: var(--teal); }
+
+  /* Steps */
+  .steps { margin: 0.75rem 0; }
+  .step {
+    display: flex;
+    gap: 0.9rem;
+    margin-bottom: 0.9rem;
+    align-items: flex-start;
+  }
+  .step-n {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--red);
+    background: rgba(255,77,77,0.1);
+    border: 1px solid rgba(255,77,77,0.2);
+    border-radius: 3px;
+    padding: 2px 6px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-b { font-size: 13.5px; color: var(--text2); line-height: 1.65; }
+  .step-b strong { color: var(--text); font-weight: 500; }
+
+  /* Checklist */
+  .clist { list-style: none; margin: 0.5rem 0; }
+  .clist li {
+    padding: 0.25rem 0 0.25rem 1.3rem;
+    position: relative;
+    font-size: 13.5px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .clist li::before { position: absolute; left: 0; font-family: var(--mono); font-size: 11px; }
+  .clist li.ok::before { content: '✓'; color: var(--green); }
+  .clist li.no::before { content: '✗'; color: var(--red); }
+  .clist li.warn::before { content: '!'; color: var(--orange); }
+  .clist li strong { color: var(--text); font-weight: 500; }
+
+  /* Inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--teal);
+  }
+
+  /* Flow */
+  .flow {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 0.75rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+  .flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .fb {
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  .fb.r { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+  .fb.g { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .fb.b { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+  .fb.o { border-color: var(--orange); color: var(--orange); background: var(--orange-bg); }
+  .fb.p { border-color: var(--purple); color: var(--purple); background: var(--purple-bg); }
+  .fb.t { border-color: var(--teal); color: var(--teal); background: var(--teal-bg); }
+  .fb.x { border-color: var(--border2); color: var(--text2); }
+  .fa { color: var(--text3); font-size: 13px; }
+
+  /* Badge colors */
+  .badge-r { background: rgba(255,77,77,0.12); color: var(--red); border: 1px solid rgba(255,77,77,0.25); }
+  .badge-g { background: rgba(6,214,160,0.12); color: var(--green); border: 1px solid rgba(6,214,160,0.25); }
+  .badge-b { background: rgba(77,166,255,0.12); color: var(--blue); border: 1px solid rgba(77,166,255,0.25); }
+  .badge-o { background: rgba(255,140,66,0.12); color: var(--orange); border: 1px solid rgba(255,140,66,0.25); }
+  .badge-p { background: rgba(192,132,252,0.12); color: var(--purple); border: 1px solid rgba(192,132,252,0.25); }
+  .badge-t { background: rgba(34,211,238,0.12); color: var(--teal); border: 1px solid rgba(34,211,238,0.25); }
+
+  /* Nav buttons */
+  .qnav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .qnav button {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text2);
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .qnav button:hover { border-color: var(--red); color: var(--red); }
+  .qnav button:disabled { opacity: 0.25; pointer-events: none; }
+  .qnav-mid { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .cgrid { grid-template-columns: 1fr; }
+    .main { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="ansible-badge">ANSIBLE</span>
+    <span class="topbar-title">Interview Guide — 10 Questions</span>
+  </div>
+  <div class="topbar-right">DevOps · Automation · IaC</div>
+</header>
+
+<div class="shell">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">Questions</div>
+  </nav>
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+const qs = [
+  {
+    tag: 'Structure', badgeClass: 'badge-b',
+    title: 'Playbook vs Role',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">Core distinction</div>
+        <p>A <strong>Playbook</strong> is a YAML file that orchestrates tasks against hosts. A <strong>Role</strong> is a reusable, self-contained unit of automation with a defined directory structure — essentially a packaged set of tasks, variables, templates and handlers that a Playbook can call.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">Analogy</div>
+        <div class="callout c-info">
+          <strong>Playbook</strong> = the recipe card. It says what to cook, in what order, for who.<br>
+          <strong>Role</strong> = a pre-packaged ingredient kit (like a spice blend). You import it into any recipe and it just works.
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Comparison</div>
+        <div class="cgrid">
+          <div class="ccard">
+            <h4 style="color:var(--blue)">Playbook</h4>
+            <ul>
+              <li>Top-level orchestration file</li>
+              <li>Defines plays: hosts + tasks</li>
+              <li>Can include/import roles</li>
+              <li>Not easily reusable across projects</li>
+              <li>Good for: one-off ops, environment setup</li>
+            </ul>
+          </div>
+          <div class="ccard">
+            <h4 style="color:var(--green)">Role</h4>
+            <ul>
+              <li>Enforced directory structure</li>
+              <li>Shareable via Ansible Galaxy</li>
+              <li>Has own vars, defaults, handlers, templates</li>
+              <li>Tested independently</li>
+              <li>Good for: nginx, docker, user management</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Role directory structure</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">filesystem</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre>roles/
+  nginx/
+    tasks/
+      main.yml       <span class="cm"># entry point — what to do</span>
+    handlers/
+      main.yml       <span class="cm"># triggered on notify</span>
+    templates/
+      nginx.conf.j2  <span class="cm"># Jinja2 templates</span>
+    files/           <span class="cm"># static files to copy</span>
+    vars/
+      main.yml       <span class="cm"># high priority variables</span>
+    defaults/
+      main.yml       <span class="cm"># lowest priority variables</span>
+    meta/
+      main.yml       <span class="cm"># role dependencies</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Using a role in a playbook</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="op">---</span>
+<span class="key">- name</span><span class="val">: Configure web servers</span>
+  <span class="key">hosts</span><span class="val">: webservers</span>
+  <span class="key">become</span><span class="val">: true</span>
+  <span class="key">roles</span><span class="val">:</span>
+    <span class="op">-</span> <span class="val">nginx</span>         <span class="cm"># shorthand</span>
+    <span class="op">-</span> <span class="key">role</span><span class="val">: nodejs</span>
+      <span class="key">node_version</span><span class="val">: "18"</span>  <span class="cm"># pass vars to role</span></pre>
+        </div>
+      </div>
+      <div class="callout c-tip">
+        <strong>Rule of thumb:</strong> If you're writing tasks you'd want to reuse in another project, it should be a Role. If it's glue code that ties roles together for a specific environment — keep it in the Playbook.
+      </div>`
+  },
+  {
+    tag: 'Variables', badgeClass: 'badge-o',
+    title: 'Vars, defaults, extra_vars, host_vars/group_vars',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">Variable precedence (low → high)</div>
+        <p>Ansible has 22 levels of variable precedence. The ones you'll use daily, in order:</p>
+        <div class="flow">
+          <div class="flow-row">
+            <div class="fb x">role defaults</div><div class="fa">→</div>
+            <div class="fb x">group_vars</div><div class="fa">→</div>
+            <div class="fb x">host_vars</div><div class="fa">→</div>
+            <div class="fb o">role vars</div><div class="fa">→</div>
+            <div class="fb r">extra_vars (-e)</div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">← lowest priority &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; highest priority →</div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Each type explained</div>
+        <table class="ktable">
+          <tr><th>Type</th><th>Location</th><th>Priority</th><th>Use for</th></tr>
+          <tr><td>defaults/main.yml</td><td>Inside a role</td><td>Lowest</td><td>Sensible defaults users can override — like default port: 80</td></tr>
+          <tr><td>vars/main.yml</td><td>Inside a role</td><td>High</td><td>Role internals — not intended for override</td></tr>
+          <tr><td>group_vars/</td><td>Project root</td><td>Medium</td><td>Variables for a group of hosts (e.g. all webservers)</td></tr>
+          <tr><td>host_vars/</td><td>Project root</td><td>Medium-high</td><td>Per-host overrides (e.g. host-specific ports)</td></tr>
+          <tr><td>extra_vars (-e)</td><td>CLI flag</td><td>Highest — always wins</td><td>Runtime overrides, CI/CD pipelines, secrets injection</td></tr>
+        </table>
+      </div>
+      <div class="section">
+        <div class="sec-label">group_vars and host_vars layout</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">filesystem</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre>inventory/
+  group_vars/
+    all.yml            <span class="cm"># applies to every host</span>
+    webservers.yml     <span class="cm"># applies to [webservers] group</span>
+    webservers/        <span class="cm"># can be a directory too</span>
+      vars.yml
+      vault.yml        <span class="cm"># encrypted secrets</span>
+  host_vars/
+    web01.yml          <span class="cm"># specific to web01 only</span>
+    db01.yml</pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Extra vars at runtime</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">bash</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Single var</span>
+ansible-playbook deploy.yml <span class="op">-e</span> <span class="str">"env=production"</span>
+
+<span class="cm"># Multiple vars</span>
+ansible-playbook deploy.yml <span class="op">-e</span> <span class="str">"env=prod version=2.1.0"</span>
+
+<span class="cm"># From a file (great for CI/CD)</span>
+ansible-playbook deploy.yml <span class="op">-e</span> @vars/prod.yml</pre>
+        </div>
+      </div>
+      <div class="callout c-warn">
+        <strong>Common mistake:</strong> Putting secrets in <code>vars/main.yml</code> instead of <code>defaults/main.yml</code> means users can't override them without editing the role. Use <code>defaults</code> for anything a consumer of your role might want to change.
+      </div>`
+  },
+  {
+    tag: 'Core Concept', badgeClass: 'badge-g',
+    title: 'How Ansible achieves idempotency',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">What idempotency means</div>
+        <p>Running the same Ansible playbook once or ten times should produce the same result — and crucially, if the system is already in the desired state, <strong>nothing should change</strong>. This is idempotency.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">How modules achieve it</div>
+        <p>The secret is that Ansible modules <em>check before they act</em>. The module first inspects the current state of the system. If it matches the desired state, it reports <code>ok</code>. Only if there's a difference does it make a change and report <code>changed</code>.</p>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># This is idempotent — module checks if package is installed</span>
+<span class="op">-</span> <span class="key">name</span><span class="val">: Install nginx</span>
+  <span class="key">ansible.builtin.package</span><span class="val">:</span>
+    <span class="key">name</span><span class="val">: nginx</span>
+    <span class="key">state</span><span class="val">: present</span>   <span class="cm"># "ensure installed", not "install"</span>
+
+<span class="cm"># Also idempotent — creates file only if missing</span>
+<span class="op">-</span> <span class="key">name</span><span class="val">: Ensure config exists</span>
+  <span class="key">ansible.builtin.template</span><span class="val">:</span>
+    <span class="key">src</span><span class="val">: nginx.conf.j2</span>
+    <span class="key">dest</span><span class="val">: /etc/nginx/nginx.conf</span>
+    <span class="key">owner</span><span class="val">: root</span>
+    <span class="key">mode</span><span class="val">: "0644"</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Non-idempotent pitfalls</div>
+        <ul class="clist">
+          <li class="no"><strong>shell/command modules</strong> — they always run and always report <code>changed</code>. Use <code>creates</code> or <code>changed_when</code> to fix this.</li>
+          <li class="no"><strong>Raw append operations</strong> — adding a line to a file without checking if it exists. Use <code>lineinfile</code> instead.</li>
+          <li class="warn"><strong>Poorly written shell tasks</strong> — always ask: "what happens if I run this twice?"</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="sec-label">Making shell tasks idempotent</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># BAD — always runs, always "changed"</span>
+<span class="op">-</span> <span class="key">shell</span><span class="val">: echo "hello" >> /etc/motd</span>
+
+<span class="cm"># GOOD — only runs if file doesn't exist</span>
+<span class="op">-</span> <span class="key">shell</span><span class="val">: generate-cert.sh</span>
+  <span class="key">args</span><span class="val">:</span>
+    <span class="key">creates</span><span class="val">: /etc/ssl/my-cert.pem</span>
+
+<span class="cm"># GOOD — suppress false "changed" reports</span>
+<span class="op">-</span> <span class="key">shell</span><span class="val">: check-cluster-status.sh</span>
+  <span class="key">changed_when</span><span class="val">: false</span>
+  <span class="key">register</span><span class="val">: cluster_status</span></pre>
+        </div>
+      </div>
+      <div class="callout c-tip">
+        <strong>Interview answer:</strong> Ansible achieves idempotency through its module design — modules inspect current state before acting. The engineer's job is to prefer declarative modules (package, file, template, user) over imperative shell/command calls, and to add <code>creates</code>, <code>changed_when</code>, or <code>when</code> guards when shell is unavoidable.
+      </div>`
+  },
+  {
+    tag: 'Modules', badgeClass: 'badge-t',
+    title: 'shell vs command module',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">The key difference</div>
+        <div class="cgrid">
+          <div class="ccard">
+            <h4 style="color:var(--teal)">command</h4>
+            <ul>
+              <li>Runs a binary directly — no shell</li>
+              <li>No pipes, redirects, &&, ||, >, $VAR</li>
+              <li>More secure (no shell injection risk)</li>
+              <li>Preferred default choice</li>
+              <li>Works: <code>ls -la /tmp</code></li>
+              <li>Fails: <code>cat file | grep word</code></li>
+            </ul>
+          </div>
+          <div class="ccard">
+            <h4 style="color:var(--orange)">shell</h4>
+            <ul>
+              <li>Runs via <code>/bin/sh -c</code></li>
+              <li>Full shell features available</li>
+              <li>Pipes, redirects, &&, env vars work</li>
+              <li>Use only when command can't do it</li>
+              <li>Works: <code>cat file | grep word > out.txt</code></li>
+              <li>Risk: shell injection if using user input</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Decision guide</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Use command — no shell features needed</span>
+<span class="op">-</span> <span class="key">ansible.builtin.command</span><span class="val">:</span>
+    <span class="key">cmd</span><span class="val">: /usr/bin/systemctl is-active nginx</span>
+
+<span class="cm"># Use shell — needs pipe and redirect</span>
+<span class="op">-</span> <span class="key">ansible.builtin.shell</span><span class="val">: |</span>
+    <span class="val">ps aux | grep nginx | grep -v grep > /tmp/nginx.pid</span>
+
+<span class="cm"># Use shell — needs env var expansion</span>
+<span class="op">-</span> <span class="key">ansible.builtin.shell</span><span class="val">: echo $HOME/.config</span>
+
+<span class="cm"># But FIRST ask — is there a proper module?</span>
+<span class="op">-</span> <span class="key">ansible.builtin.service</span><span class="val">:</span>   <span class="cm"># better than shell: systemctl</span>
+    <span class="key">name</span><span class="val">: nginx</span>
+    <span class="key">state</span><span class="val">: started</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Also consider: raw and script</div>
+        <table class="ktable">
+          <tr><th>Module</th><th>When to use</th></tr>
+          <tr><td>command</td><td>Default — simple binaries, no shell</td></tr>
+          <tr><td>shell</td><td>Need pipes, redirects, shell expansion</td></tr>
+          <tr><td>script</td><td>Copy a local script to remote and run it</td></tr>
+          <tr><td>raw</td><td>Target has no Python (bootstrapping, network devices)</td></tr>
+        </table>
+      </div>
+      <div class="callout c-warn">
+        <strong>Best practice:</strong> Always reach for a dedicated module first — <code>package</code>, <code>service</code>, <code>file</code>, <code>template</code>, <code>lineinfile</code>. Only fall back to <code>command</code> or <code>shell</code> if no module exists. Dedicated modules are idempotent; shell/command are not.
+      </div>`
+  },
+  {
+    tag: 'Security', badgeClass: 'badge-r',
+    title: 'Ansible Vault',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">What it is</div>
+        <p><strong>Ansible Vault</strong> encrypts sensitive data — passwords, API keys, TLS certificates, cloud credentials — at rest using AES-256. Encrypted files live in your repo safely, and Ansible decrypts them at runtime using a password or key file.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">Essential vault commands</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">bash</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Encrypt an entire file</span>
+ansible-vault encrypt group_vars/all/vault.yml
+
+<span class="cm"># Encrypt a single string (embed in YAML)</span>
+ansible-vault encrypt_string <span class="str">'s3cr3tP@ss'</span> --name <span class="str">'db_password'</span>
+
+<span class="cm"># Edit encrypted file in-place</span>
+ansible-vault edit group_vars/all/vault.yml
+
+<span class="cm"># Decrypt to view</span>
+ansible-vault view group_vars/all/vault.yml
+
+<span class="cm"># Re-key (change password)</span>
+ansible-vault rekey secrets.yml
+
+<span class="cm"># Run playbook with vault password</span>
+ansible-playbook site.yml --ask-vault-pass
+ansible-playbook site.yml --vault-password-file ~/.vault_pass</pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Recommended pattern — split vars and vault</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># group_vars/all/vars.yml — plain text, in git</span>
+<span class="key">db_host</span><span class="val">: db.example.com</span>
+<span class="key">db_port</span><span class="val">: 5432</span>
+<span class="key">db_password</span><span class="val">: "{{ vault_db_password }}"</span>  <span class="cm"># reference vault var</span>
+
+<span class="cm"># group_vars/all/vault.yml — encrypted, in git</span>
+<span class="cm"># $ANSIBLE_VAULT;1.1;AES256</span>
+<span class="cm"># 64343834303736...</span>
+<span class="key">vault_db_password</span><span class="val">: s3cr3tP@ss</span></pre>
+        </div>
+        <p>This way you can grep plain <code>vars.yml</code> to see what variables exist, while the actual secrets stay encrypted.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">Multiple vault passwords (vault-id)</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">bash</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Encrypt with a labelled vault ID</span>
+ansible-vault encrypt --vault-id prod@~/.vault_prod secrets.yml
+
+<span class="cm"># Run with multiple vault IDs</span>
+ansible-playbook site.yml \
+  --vault-id dev@~/.vault_dev \
+  --vault-id prod@~/.vault_prod</pre>
+        </div>
+      </div>
+      <div class="callout c-tip">
+        <strong>CI/CD tip:</strong> Store the vault password in your CI secrets store (GitHub Actions secrets, Azure Key Vault, etc.) and pass it via <code>--vault-password-file</code> pointing to a temp file, or set <code>ANSIBLE_VAULT_PASSWORD_FILE</code> environment variable.
+      </div>`
+  },
+  {
+    tag: 'Core Concept', badgeClass: 'badge-g',
+    title: 'Handlers — how and why',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">What handlers are</div>
+        <p>Handlers are tasks that only run when <strong>notified</strong> by another task — and only if that notifying task actually made a change. They run <strong>once</strong> at the end of a play, regardless of how many tasks notified them.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">The classic use case</div>
+        <p>Restart nginx — but only if the config actually changed. Without handlers you'd restart nginx every time the playbook runs, causing unnecessary downtime.</p>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="op">---</span>
+<span class="key">tasks</span><span class="val">:</span>
+  <span class="op">-</span> <span class="key">name</span><span class="val">: Deploy nginx config</span>
+    <span class="key">ansible.builtin.template</span><span class="val">:</span>
+      <span class="key">src</span><span class="val">: nginx.conf.j2</span>
+      <span class="key">dest</span><span class="val">: /etc/nginx/nginx.conf</span>
+    <span class="key">notify</span><span class="val">: Restart nginx</span>   <span class="cm"># fires only on "changed"</span>
+
+  <span class="op">-</span> <span class="key">name</span><span class="val">: Deploy SSL certificate</span>
+    <span class="key">ansible.builtin.copy</span><span class="val">:</span>
+      <span class="key">src</span><span class="val">: cert.pem</span>
+      <span class="key">dest</span><span class="val">: /etc/ssl/cert.pem</span>
+    <span class="key">notify</span><span class="val">: Restart nginx</span>   <span class="cm"># same handler — runs once</span>
+
+<span class="key">handlers</span><span class="val">:</span>
+  <span class="op">-</span> <span class="key">name</span><span class="val">: Restart nginx</span>
+    <span class="key">ansible.builtin.service</span><span class="val">:</span>
+      <span class="key">name</span><span class="val">: nginx</span>
+      <span class="key">state</span><span class="val">: restarted</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Handler execution rules</div>
+        <ul class="clist">
+          <li class="ok">Handlers run <strong>once per play</strong>, at the end — even if notified by 10 tasks</li>
+          <li class="ok">They only run if the notifying task reported <code>changed</code></li>
+          <li class="ok">Handler order follows declaration order, not notify order</li>
+          <li class="warn">If the play fails mid-way, handlers in the queue <strong>won't run</strong> — use <code>--force-handlers</code> to override</li>
+          <li class="no">Handler names must match exactly (including case)</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="sec-label">Force immediate handler execution</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Flush handlers mid-play (useful before dependent tasks)</span>
+<span class="op">-</span> <span class="key">name</span><span class="val">: Deploy config</span>
+  <span class="key">template</span><span class="val">: ...</span>
+  <span class="key">notify</span><span class="val">: Restart nginx</span>
+
+<span class="op">-</span> <span class="key">name</span><span class="val">: Flush handlers now</span>
+  <span class="key">ansible.builtin.meta</span><span class="val">: flush_handlers</span>
+
+<span class="op">-</span> <span class="key">name</span><span class="val">: Wait for nginx to come up</span>
+  <span class="cm"># nginx is already restarted by this point</span>
+  <span class="key">ansible.builtin.wait_for</span><span class="val">:</span>
+    <span class="key">port</span><span class="val">: 80</span></pre>
+        </div>
+      </div>`
+  },
+  {
+    tag: 'Inventory', badgeClass: 'badge-p',
+    title: 'Static vs dynamic inventory',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">The difference</div>
+        <p>A <strong>static inventory</strong> is a file (INI or YAML) you maintain by hand. A <strong>dynamic inventory</strong> is a script or plugin that queries an external source (AWS, Azure, GCP, Terraform state, CMDB) at runtime and returns hosts as JSON.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">Static inventory</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">ini</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># inventory/hosts.ini</span>
+[webservers]
+web01.example.com
+web02.example.com ansible_user=ubuntu
+
+[dbservers]
+db01.example.com ansible_port=2222
+
+[webservers:vars]
+http_port=80
+
+[prod:children]
+webservers
+dbservers</pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Dynamic inventory (Azure example)</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># inventory/azure_rm.yml — uses azure_rm plugin</span>
+<span class="key">plugin</span><span class="val">: azure.azcollection.azure_rm</span>
+<span class="key">auth_source</span><span class="val">: auto</span>           <span class="cm"># uses env vars or managed identity</span>
+<span class="key">include_vm_resource_groups</span><span class="val">:</span>
+  <span class="op">-</span> <span class="val">my-resource-group</span>
+<span class="key">keyed_groups</span><span class="val">:</span>
+  <span class="op">-</span> <span class="key">prefix</span><span class="val">: tag</span>
+    <span class="key">key</span><span class="val">: tags.Environment</span>  <span class="cm"># group VMs by tag</span>
+<span class="key">hostvar_expressions</span><span class="val">:</span>
+  <span class="key">ansible_host</span><span class="val">: private_ipv4_addresses[0]</span></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">bash</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Use it like any inventory</span>
+ansible-playbook <span class="op">-i</span> inventory/azure_rm.yml site.yml
+
+<span class="cm"># Test what hosts it returns</span>
+ansible-inventory <span class="op">-i</span> inventory/azure_rm.yml --list</pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">When to use each</div>
+        <table class="ktable">
+          <tr><th>Scenario</th><th>Recommendation</th></tr>
+          <tr><td>Static, small infrastructure</td><td>Static inventory — simple, version-controlled</td></tr>
+          <tr><td>Cloud (AWS/Azure/GCP)</td><td>Dynamic — VMs come and go, tags drive groups</td></tr>
+          <tr><td>Kubernetes nodes</td><td>Dynamic — use kubevirt or k8s inventory plugin</td></tr>
+          <tr><td>Mixed (static + cloud)</td><td>Use inventory directory with both file types</td></tr>
+        </table>
+      </div>
+      <div class="callout c-tip">
+        <strong>Pro tip:</strong> Point <code>-i</code> at a directory, not a file. Ansible merges all inventory sources in that directory automatically — mix a static <code>hosts.ini</code> with a dynamic <code>azure_rm.yml</code> plugin file.
+      </div>`
+  },
+  {
+    tag: 'Project Structure', badgeClass: 'badge-b',
+    title: 'Structuring a large Ansible project',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">Recommended layout</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">filesystem</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre>ansible-project/
+├── ansible.cfg               <span class="cm"># project config (inventory path, roles path)</span>
+├── site.yml                  <span class="cm"># master playbook — imports all plays</span>
+├── webservers.yml            <span class="cm"># play for webservers</span>
+├── dbservers.yml             <span class="cm"># play for databases</span>
+│
+├── inventory/
+│   ├── prod/
+│   │   ├── hosts.ini
+│   │   ├── group_vars/
+│   │   │   ├── all/
+│   │   │   │   ├── vars.yml      <span class="cm"># plain vars</span>
+│   │   │   │   └── vault.yml     <span class="cm"># encrypted secrets</span>
+│   │   │   └── webservers.yml
+│   │   └── host_vars/
+│   │       └── web01.yml
+│   └── staging/              <span class="cm"># mirror structure for staging</span>
+│
+├── roles/
+│   ├── common/               <span class="cm"># applied to every host</span>
+│   ├── nginx/
+│   ├── nodejs/
+│   └── requirements.yml      <span class="cm"># Galaxy roles to install</span>
+│
+├── library/                  <span class="cm"># custom modules</span>
+├── filter_plugins/           <span class="cm"># custom Jinja2 filters</span>
+└── collections/
+    └── requirements.yml      <span class="cm"># Ansible collections</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">ansible.cfg — the project anchor</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">ini</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre>[defaults]
+inventory         = inventory/prod
+roles_path        = roles
+collections_path  = collections
+vault_password_file = ~/.vault_pass
+stdout_callback   = yaml
+callbacks_enabled = profile_tasks  <span class="cm"># shows task timing</span>
+
+[ssh_connection]
+pipelining        = True    <span class="cm"># major speed improvement</span>
+control_path      = /tmp/ansible-ssh-%%h-%%p-%%r</pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Key principles</div>
+        <ul class="clist">
+          <li class="ok">Separate inventory per environment (prod, staging, dev)</li>
+          <li class="ok">Role dependencies declared in <code>meta/main.yml</code>, not in playbooks</li>
+          <li class="ok">A <code>common</code> role handles baseline config (NTP, logging, users) applied everywhere</li>
+          <li class="ok">Use <code>import_role</code> (static) over <code>include_role</code> (dynamic) where possible — better for <code>--list-tasks</code> and check mode</li>
+          <li class="warn">Don't put prod secrets next to dev — separate vault passwords per environment</li>
+          <li class="no">Avoid playbooks that do everything — one play per concern</li>
+        </ul>
+      </div>`
+  },
+  {
+    tag: 'Debugging', badgeClass: 'badge-r',
+    title: 'Troubleshooting with verbosity (-vvv)',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">Verbosity levels</div>
+        <table class="ktable">
+          <tr><th>Flag</th><th>What you see</th></tr>
+          <tr><td>-v</td><td>Task results, return values</td></tr>
+          <tr><td>-vv</td><td>Input args to each task</td></tr>
+          <tr><td>-vvv</td><td>SSH connection details, full module args — the most useful level</td></tr>
+          <tr><td>-vvvv</td><td>SSH connection internals, plugin loading (very verbose)</td></tr>
+          <tr><td>-vvvvv</td><td>WinRM details, extreme debug — rarely needed</td></tr>
+        </table>
+      </div>
+      <div class="section">
+        <div class="sec-label">Diagnostic toolkit</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">bash</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Run with full SSH debug output</span>
+ansible-playbook site.yml <span class="op">-vvv</span>
+
+<span class="cm"># Test connectivity first</span>
+ansible all <span class="op">-m</span> ping <span class="op">-i</span> inventory/hosts.ini
+
+<span class="cm"># Run a single task by tag</span>
+ansible-playbook site.yml <span class="op">--tags</span> nginx <span class="op">-vv</span>
+
+<span class="cm"># Limit to one host</span>
+ansible-playbook site.yml <span class="op">--limit</span> web01 <span class="op">-vvv</span>
+
+<span class="cm"># Step through tasks interactively</span>
+ansible-playbook site.yml <span class="op">--step</span>
+
+<span class="cm"># List all tasks without running</span>
+ansible-playbook site.yml <span class="op">--list-tasks</span>
+
+<span class="cm"># Check what hosts a playbook targets</span>
+ansible-playbook site.yml <span class="op">--list-hosts</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Debug module — inspect variables mid-play</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="op">-</span> <span class="key">name</span><span class="val">: Print all variables for this host</span>
+  <span class="key">ansible.builtin.debug</span><span class="val">:</span>
+    <span class="key">var</span><span class="val">: hostvars[inventory_hostname]</span>
+
+<span class="op">-</span> <span class="key">name</span><span class="val">: Register and inspect command output</span>
+  <span class="key">ansible.builtin.command</span><span class="val">: df -h</span>
+  <span class="key">register</span><span class="val">: disk_usage</span>
+
+<span class="op">-</span> <span class="key">ansible.builtin.debug</span><span class="val">:</span>
+    <span class="key">var</span><span class="val">: disk_usage.stdout_lines</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Common issues and fixes</div>
+        <table class="ktable">
+          <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+          <tr><td>Unreachable</td><td>SSH key, wrong user, firewall</td><td><code>-vvv</code> shows SSH error; check <code>ansible_user</code></td></tr>
+          <tr><td>Module not found</td><td>Collection not installed</td><td><code>ansible-galaxy collection install &lt;name&gt;</code></td></tr>
+          <tr><td>Variable undefined</td><td>Scope or typo</td><td><code>debug: var=hostvars</code> to inspect all vars</td></tr>
+          <tr><td>Unexpected changed</td><td>Non-idempotent task</td><td>Add <code>changed_when: false</code> or use proper module</td></tr>
+          <tr><td>Handlers not running</td><td>Play failed before end</td><td><code>--force-handlers</code> or <code>meta: flush_handlers</code></td></tr>
+        </table>
+      </div>`
+  },
+  {
+    tag: 'Safety', badgeClass: 'badge-o',
+    title: 'Check mode (--check) and why it\'s critical',
+    content: () => `
+      <div class="section">
+        <div class="sec-label">What check mode does</div>
+        <p><strong>Check mode</strong> (<code>--check</code>) is Ansible's dry-run mode. Ansible connects to hosts, evaluates tasks, and tells you what <em>would</em> change — but makes <strong>zero changes</strong> to the system. Think of it as reading the diff before applying a git patch.</p>
+      </div>
+      <div class="section">
+        <div class="sec-label">Basic usage</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">bash</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Dry run — see what would change</span>
+ansible-playbook site.yml <span class="op">--check</span>
+
+<span class="cm"># Check + diff — see exact file changes</span>
+ansible-playbook site.yml <span class="op">--check --diff</span>
+
+<span class="cm"># --diff alone shows file diffs on real runs too</span>
+ansible-playbook site.yml <span class="op">--diff</span></pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">--diff output example</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">diff</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre>TASK [nginx : Deploy nginx config]
+--- before: /etc/nginx/nginx.conf
++++ after: /etc/nginx/nginx.conf
+@@ -12,7 +12,7 @@
+   server {
+-    listen 80;
++    listen 8080;
+     server_name example.com;</pre>
+        </div>
+      </div>
+      <div class="section">
+        <div class="sec-label">Why it's critical in production</div>
+        <ul class="clist">
+          <li class="ok">Run <code>--check --diff</code> in your CI pipeline on every PR — gate merges on the output</li>
+          <li class="ok">Before any production run, always do a check run first</li>
+          <li class="ok">Catches accidental template changes, wrong variable values, scope errors</li>
+          <li class="warn">Shell and command modules don't know what they'd change — they're skipped in check mode</li>
+          <li class="no">Check mode can give false confidence if many tasks use shell/command</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="sec-label">Controlling check mode per task</div>
+        <div class="code-wrap">
+          <div class="code-top"><span class="code-lang">yaml</span><div class="code-dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div></div>
+          <pre><span class="cm"># Force a task to always run, even in check mode</span>
+<span class="op">-</span> <span class="key">name</span><span class="val">: Gather service status (safe to always run)</span>
+  <span class="key">ansible.builtin.command</span><span class="val">: systemctl is-active nginx</span>
+  <span class="key">check_mode</span><span class="val">: false</span>   <span class="cm"># run even during --check</span>
+  <span class="key">changed_when</span><span class="val">: false</span>
+
+<span class="cm"># Skip a task in check mode (it would fail without real state)</span>
+<span class="op">-</span> <span class="key">name</span><span class="val">: Restart dependent service</span>
+  <span class="key">service</span><span class="val">: name=app state=restarted</span>
+  <span class="key">when</span><span class="val">: not ansible_check_mode</span></pre>
+        </div>
+      </div>
+      <div class="callout c-danger">
+        <strong>Production discipline:</strong> Establish this workflow — <code>--check --diff</code> → peer review the output → run for real. Skipping this on prod changes is how you cause outages. The 2 minutes it takes to review diff output has saved many engineers from 2am incidents.
+      </div>`
+  }
+];
+
+let cur = 0;
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  qs.forEach((q, i) => {
+    const el = document.createElement('div');
+    el.className = 'nav-item' + (i===0?' active':'');
+    el.innerHTML = `<span class="nav-idx">0${i+1}</span><span>${q.title}</span>`;
+    el.onclick = () => showQ(i);
+    sb.appendChild(el);
+  });
+}
+
+function buildCards() {
+  const main = document.getElementById('main');
+  qs.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card' + (i===0?' active':'');
+    card.id = 'q'+i;
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-meta">
+          <span class="q-badge ${q.badgeClass}">${q.tag}</span>
+          <span class="q-num">Q${i+1} of ${qs.length}</span>
+        </div>
+        <h1 class="q-title">${q.title}</h1>
+      </div>
+      ${q.content()}
+      <div class="qnav">
+        <button onclick="showQ(${i-1})" ${i===0?'disabled':''}>← Prev</button>
+        <span class="qnav-mid">${i+1} / ${qs.length}</span>
+        <button onclick="showQ(${i+1})" ${i===qs.length-1?'disabled':''}>Next →</button>
+      </div>
+    `;
+    main.appendChild(card);
+  });
+}
+
+function showQ(idx) {
+  if (idx < 0 || idx >= qs.length) return;
+  document.querySelectorAll('.q-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('q'+idx).classList.add('active');
+  document.querySelectorAll('.nav-item')[idx].classList.add('active');
+  document.getElementById('prog').style.width = ((idx+1)/qs.length*100)+'%';
+  document.querySelector('.main').scrollTop = 0;
+  cur = idx;
+}
+
+buildSidebar();
+buildCards();
+document.getElementById('prog').style.width = (1/qs.length*100)+'%';
+</script>
+</body>
+</html>
